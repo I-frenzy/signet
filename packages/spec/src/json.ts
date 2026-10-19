@@ -39,6 +39,9 @@ import { allFunctionSchemas } from './json-schema.ts';
 /** Current `SpecJson` schema version. See `schemaVersion` below for the bump policy. */
 export const SPEC_JSON_SCHEMA_VERSION = 1;
 
+/** Where a contract specification originated from. */
+export type SpecProvenance = 'embedded' | 'orbital_registry';
+
 /**
  * Versioned, deterministic JSON form of a `ContractSpec`.
  *
@@ -65,6 +68,12 @@ export interface SpecJson {
   warnings: string[];
   /** Optional JSON Schema per function arguments (B-15). */
   functionSchemas?: Record<string, JSONSchema7>;
+  /** Where this spec originated from ('embedded' or 'orbital_registry'). */
+  provenance?: SpecProvenance;
+  /** Pointer or URI identifying the attestation in the registry (when from registry). */
+  attestationPointer?: string;
+  /** Hash of the attestation record (when from registry). */
+  attestationHash?: string;
 }
 
 /** Extra extraction notes appended to the spec's own `warnings` at serialisation time. */
@@ -189,6 +198,9 @@ export function toSpecJson(spec: ContractSpec, options: ToSpecJsonOptions = {}):
       : (spec as { functionSchemas?: Record<string, JSONSchema7> }).functionSchemas !== undefined
         ? { functionSchemas: (spec as { functionSchemas?: Record<string, JSONSchema7> }).functionSchemas }
         : {}),
+    provenance: spec.provenance ?? 'embedded',
+    ...(spec.attestationPointer !== undefined ? { attestationPointer: spec.attestationPointer } : {}),
+    ...(spec.attestationHash !== undefined ? { attestationHash: spec.attestationHash } : {}),
   };
 }
 
@@ -220,6 +232,9 @@ export function fromSpecJson(json: SpecJson): ContractSpec {
     ...(json.env !== undefined ? { env: json.env } : {}),
     warnings: json.warnings,
     sdkVersion: json.sdkVersion,
+    ...(json.provenance !== undefined ? { provenance: json.provenance } : {}),
+    ...(json.attestationPointer !== undefined ? { attestationPointer: json.attestationPointer } : {}),
+    ...(json.attestationHash !== undefined ? { attestationHash: json.attestationHash } : {}),
   };
 }
 
