@@ -98,7 +98,7 @@ export function ContractChanges({ versions, network }: ContractChangesProps): Re
           React.createElement('div', { className: 'font-mono text-xs font-semibold text-[#8a8779]' }, headingText),
           React.createElement(
             'p',
-            { className: 'mt-2 text-xs text-[#e05a4b]' },
+            { className: 'mt-2 break-all text-xs text-[#e05a4b]' },
             `Interface for ${current.wasmHash} is no longer retrievable from ${network}`,
           ),
         ),
@@ -148,7 +148,7 @@ export function ContractChanges({ versions, network }: ContractChangesProps): Re
           );
         }
         changeNodes.push(
-          React.createElement('li', { key: idx, className: 'flex flex-wrap items-center gap-2 text-xs text-[#dcd9ce]' }, ...items),
+          React.createElement('li', { key: idx, className: 'flex flex-wrap items-center gap-2 break-words text-xs text-[#dcd9ce]' }, ...items),
         );
       }
     }
