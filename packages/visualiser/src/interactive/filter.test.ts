@@ -203,9 +203,9 @@ test('enhanceFilter: typing claim leaves 1 highlighted node, announces 1 of 8 fu
 test('renderDiagramSvg: server-side query applies viz-dimmed to non-matches and emits anchor id', () => {
   const model: DiagramModel = {
     nodes: [
-      { id: 'fn:claim', label: 'claim', kind: 'function', column: 0, order: 0 },
-      { id: 'fn:swap', label: 'swap', kind: 'function', column: 0, order: 1 },
-      { id: 'type:Address', label: 'Address', kind: 'type', column: 1, order: 0 },
+      { id: 'fn:claim', label: 'claim' },
+      { id: 'fn:swap', label: 'swap' },
+      { id: 'type:Address', label: 'Address' },
     ],
     edges: [],
   };

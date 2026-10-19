@@ -59,7 +59,7 @@ export function formatFilterAnnouncement(
 export function enhanceFilter(options: EnhanceFilterOptions): FilterController {
   const { container } = options;
 
-  let input =
+  const input =
     options.input ??
     (container.querySelector<HTMLInputElement>('input[type="search"], input[name="q"], .viz-filter-input') ||
       undefined);

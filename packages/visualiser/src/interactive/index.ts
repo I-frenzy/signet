@@ -66,6 +66,12 @@ export {
   enhanceFilter,
   formatFilterAnnouncement,
 } from './filter.ts';
+export type { PermalinkOptions } from './permalink.ts';
+export {
+  attachPermalinkButton,
+  buildNodePermalink,
+  enhancePermalinks,
+} from './permalink.ts';
 
 /**
  * Placeholder for the pan/zoom/selection enhancer that lands in #501–#505.

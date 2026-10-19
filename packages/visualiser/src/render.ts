@@ -23,6 +23,8 @@ export interface RenderOptions {
   ariaDescribedBy?: string;
   /** Optional search query for server-side filtering (?q=, issue 503). */
   query?: string;
+  /** Optional focused node ID for permalinks (?focus=, issue 505). */
+  focus?: string;
 }
 
 /**
@@ -94,6 +96,24 @@ export function renderDiagramSvg(model: DiagramModel, opts: RenderOptions): stri
   svgParts.push('    </marker>');
   svgParts.push('  </defs>');
 
+  const focusNode = opts.focus ? model.nodes.find((n) => n.id === opts.focus) : undefined;
+  const isFocusValid = Boolean(focusNode);
+
+  const oneHopNeighbourIds = new Set<string>();
+  const incidentEdgeIds = new Set<string>();
+
+  if (focusNode) {
+    for (const edge of model.edges) {
+      if (edge.from === focusNode.id) {
+        oneHopNeighbourIds.add(edge.to);
+        incidentEdgeIds.add(`${edge.from}->${edge.to}`);
+      } else if (edge.to === focusNode.id) {
+        oneHopNeighbourIds.add(edge.from);
+        incidentEdgeIds.add(`${edge.from}->${edge.to}`);
+      }
+    }
+  }
+
   // Edges first (so they render behind nodes)
   for (const edge of model.edges) {
     const fromNode = model.nodes.find((n) => n.id === edge.from);
@@ -107,9 +127,17 @@ export function renderDiagramSvg(model: DiagramModel, opts: RenderOptions): stri
     const toY = 100;
 
     const edgeId = `${idPrefix}edge-${escapeXml(edge.from)}-${escapeXml(edge.to)}`;
+    let edgeClass = `diagram-edge${edge.label ? ' diagram-edge--labeled' : ''}`;
+    if (isFocusValid) {
+      if (incidentEdgeIds.has(`${edge.from}->${edge.to}`)) {
+        edgeClass += ' viz-edge--incident';
+      } else {
+        edgeClass += ' viz-dimmed';
+      }
+    }
     svgParts.push(`  <line`);
     svgParts.push(`    id="${escapeXml(edgeId)}"`);
-    svgParts.push(`    class="diagram-edge${edge.label ? ' diagram-edge--labeled' : ''}"`);
+    svgParts.push(`    class="${edgeClass}"`);
     // Endpoints as data attributes (issue 500). Node ids contain `:` (e.g.
     // `fn:foo`), which cannot go in a `#id` selector unescaped, so the detail
     // card enhancer matches incident edges by attribute value instead.
@@ -128,26 +156,41 @@ export function renderDiagramSvg(model: DiagramModel, opts: RenderOptions): stri
     const href = hrefForNode(node.id);
     const nodeId = `${idPrefix}node-${escapeXml(node.id)}`;
     const label = escapeXml(node.label);
+    const anchorId = `diagram-${escapeXml(node.id.replace(/:/g, '-'))}`;
+
+    let focusClass = '';
+    let autofocusAttr = '';
+    if (isFocusValid) {
+      if (node.id === focusNode!.id) {
+        focusClass = ' viz-focused';
+        autofocusAttr = ' autofocus=""';
+      } else if (oneHopNeighbourIds.has(node.id)) {
+        focusClass = ' viz-neighbour';
+      } else {
+        focusClass = ' viz-dimmed';
+      }
+    }
 
     const cleanQuery = opts.query?.trim().toLowerCase();
     const isMatch = cleanQuery
       ? node.id.toLowerCase().includes(cleanQuery) || node.label.toLowerCase().includes(cleanQuery)
       : true;
     const filterClass = cleanQuery && !isMatch ? ' viz-dimmed' : cleanQuery && isMatch ? ' viz-match' : '';
-    const containerClass = filterClass ? ` class="${filterClass.trim()}"` : '';
+    const stateClass = focusClass + filterClass;
+    const containerClass = stateClass ? ` class="${stateClass.trim()}"` : '';
 
     if (href) {
-      svgParts.push(`  <a href="${escapeXml(href)}" data-node-id="${escapeXml(node.id)}"${containerClass}>`);
+      svgParts.push(`  <a id="${anchorId}" href="${escapeXml(href)}" data-node-id="${escapeXml(node.id)}"${containerClass}${autofocusAttr}>`);
     } else {
-      svgParts.push(`  <g data-node-id="${escapeXml(node.id)}"${containerClass}>`);
+      svgParts.push(`  <g id="${anchorId}" data-node-id="${escapeXml(node.id)}"${containerClass}${autofocusAttr}>`);
     }
 
     const isFunction = node.id.startsWith('fn:');
     let nodeClass = isFunction
       ? 'diagram-node diagram-node--function'
       : 'diagram-node diagram-node--type';
-    if (filterClass) {
-      nodeClass += filterClass;
+    if (stateClass) {
+      nodeClass += stateClass;
     }
 
     svgParts.push(`    <rect`);
