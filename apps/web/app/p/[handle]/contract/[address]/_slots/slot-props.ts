@@ -1,5 +1,7 @@
 import type { Network } from '@signet/types';
 import type { SpecInput } from '@/lib/contract-overview';
+import type { WasmVersionRow } from '@/lib/contract-upgrades';
+import type { VersionSpecItem } from '@/lib/contract-changelog';
 
 /**
  * What every tab slot receives (#450): the contract's identity and the result
@@ -13,4 +15,6 @@ export interface ContractSlotProps {
   /** Indexed WASM hash; `null` on the Horizon attribution path. */
   wasmHash: string | null;
   spec: SpecInput;
+  wasmVersions?: readonly WasmVersionRow[];
+  versionSpecs?: readonly VersionSpecItem[];
 }

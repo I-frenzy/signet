@@ -10,6 +10,7 @@ import {
 } from '../_docs';
 import { DocsState } from '../_docs/docs-state';
 import { SpecWarnings } from '../_docs/spec-warnings';
+import { ContractChanges } from '@/lib/contract-changelog';
 import type { ContractSlotProps } from './slot-props';
 
 /**
@@ -18,13 +19,21 @@ import type { ContractSlotProps } from './slot-props';
  * be read, `DocsState` says why (#470, §1.5) and shows no list; the decoder's
  * warnings sit below the list.
  */
-export function ContractFunctions({ handle, address, network, spec }: ContractSlotProps) {
+export function ContractFunctions({
+  handle,
+  address,
+  network,
+  spec,
+  versionSpecs,
+  wasmVersions,
+}: ContractSlotProps) {
   if (spec.kind === 'failure') {
     return <DocsState slot="functions" failure={spec.failure} network={network} address={address} />;
   }
   const specJson = spec.spec as SpecJson;
   const typesHref = typesTabHref(handle, address);
   const tocItems = buildFunctionsToc(specJson, typesHref);
+  const versionsToDiff = versionSpecs ?? (wasmVersions as any);
 
   return (
     <section data-testid="slot-functions">
@@ -46,6 +55,9 @@ export function ContractFunctions({ handle, address, network, spec }: ContractSl
         </div>
       </div>
       <SpecWarnings warnings={spec.spec.warnings} />
+      {versionsToDiff && versionsToDiff.length > 1 && (
+        <ContractChanges versions={versionsToDiff} network={network} />
+      )}
     </section>
   );
 }
