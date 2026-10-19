@@ -13,4 +13,8 @@ export interface ContractSlotProps {
   /** Indexed WASM hash; `null` on the Horizon attribution path. */
   wasmHash: string | null;
   spec: SpecInput;
+  /** Filter query (?q=, #503) */
+  query?: string;
+  /** Focused node ID (?focus=, #505) */
+  focus?: string;
 }

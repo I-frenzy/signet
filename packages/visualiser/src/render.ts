@@ -21,6 +21,8 @@ export interface RenderOptions {
   title: string;
   /** Optional ID of an element that describes this SVG (e.g. outline details for a11y, issue 499). */
   ariaDescribedBy?: string;
+  /** Optional search query for server-side filtering (?q=, issue 503). */
+  query?: string;
 }
 
 /**
@@ -127,16 +129,26 @@ export function renderDiagramSvg(model: DiagramModel, opts: RenderOptions): stri
     const nodeId = `${idPrefix}node-${escapeXml(node.id)}`;
     const label = escapeXml(node.label);
 
+    const cleanQuery = opts.query?.trim().toLowerCase();
+    const isMatch = cleanQuery
+      ? node.id.toLowerCase().includes(cleanQuery) || node.label.toLowerCase().includes(cleanQuery)
+      : true;
+    const filterClass = cleanQuery && !isMatch ? ' viz-dimmed' : cleanQuery && isMatch ? ' viz-match' : '';
+    const containerClass = filterClass ? ` class="${filterClass.trim()}"` : '';
+
     if (href) {
-      svgParts.push(`  <a href="${escapeXml(href)}" data-node-id="${escapeXml(node.id)}">`);
+      svgParts.push(`  <a href="${escapeXml(href)}" data-node-id="${escapeXml(node.id)}"${containerClass}>`);
     } else {
-      svgParts.push(`  <g data-node-id="${escapeXml(node.id)}">`);
+      svgParts.push(`  <g data-node-id="${escapeXml(node.id)}"${containerClass}>`);
     }
 
     const isFunction = node.id.startsWith('fn:');
-    const nodeClass = isFunction
+    let nodeClass = isFunction
       ? 'diagram-node diagram-node--function'
       : 'diagram-node diagram-node--type';
+    if (filterClass) {
+      nodeClass += filterClass;
+    }
 
     svgParts.push(`    <rect`);
     svgParts.push(`      id="${escapeXml(nodeId)}"`);

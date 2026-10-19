@@ -56,6 +56,17 @@ export {
 } from './png.ts';
 export { IBM_PLEX_MONO_BASE64 } from './font.ts';
 
+export type {
+  EnhanceFilterOptions,
+  FilterController,
+  FilterResult,
+} from './filter.ts';
+export {
+  FILTER_CLASSES,
+  enhanceFilter,
+  formatFilterAnnouncement,
+} from './filter.ts';
+
 /**
  * Placeholder for the pan/zoom/selection enhancer that lands in #501–#505.
  * Kept so the package's `./interactive` entry has a stable surface while that
