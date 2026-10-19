@@ -10,7 +10,7 @@ import {
 } from '../_docs';
 import { DocsState } from '../_docs/docs-state';
 import { SpecWarnings } from '../_docs/spec-warnings';
-import { ContractChanges } from '@/lib/contract-changelog';
+import { ContractChanges, type VersionSpecItem } from '@/lib/contract-changelog';
 import type { ContractSlotProps } from './slot-props';
 
 /**
@@ -25,15 +25,13 @@ export function ContractFunctions({
   network,
   spec,
   versionSpecs,
-  wasmVersions,
-}: ContractSlotProps) {
+}: ContractSlotProps & { versionSpecs?: readonly VersionSpecItem[] }) {
   if (spec.kind === 'failure') {
     return <DocsState slot="functions" failure={spec.failure} network={network} address={address} />;
   }
   const specJson = spec.spec as SpecJson;
   const typesHref = typesTabHref(handle, address);
   const tocItems = buildFunctionsToc(specJson, typesHref);
-  const versionsToDiff = versionSpecs ?? (wasmVersions as any);
 
   return (
     <section data-testid="slot-functions">
@@ -55,8 +53,8 @@ export function ContractFunctions({
         </div>
       </div>
       <SpecWarnings warnings={spec.spec.warnings} />
-      {versionsToDiff && versionsToDiff.length > 1 && (
-        <ContractChanges versions={versionsToDiff} network={network} />
+      {versionSpecs && versionSpecs.length > 1 && (
+        <ContractChanges versions={versionSpecs} network={network} />
       )}
     </section>
   );
