@@ -29,6 +29,7 @@ import type {
   SpecEvent,
   SpecField,
   SpecFunction,
+  SpecProvenance,
   SpecType,
   TypeRef,
 } from './types.ts';
@@ -38,9 +39,6 @@ import { allFunctionSchemas } from './json-schema.ts';
 
 /** Current `SpecJson` schema version. See `schemaVersion` below for the bump policy. */
 export const SPEC_JSON_SCHEMA_VERSION = 1;
-
-/** Where a contract specification originated from. */
-export type SpecProvenance = 'embedded' | 'orbital_registry';
 
 /**
  * Versioned, deterministic JSON form of a `ContractSpec`.
