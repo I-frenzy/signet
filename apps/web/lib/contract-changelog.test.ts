@@ -16,6 +16,7 @@ function makeSyntheticSpecs(): { v1: SpecJson; v2: SpecJson } {
         name: 'transfer',
         inputs: [{ name: 'amount', type: 'u32' }],
         outputs: [],
+        doc: '',
         isConstructor: false,
       },
     ],
@@ -38,12 +39,14 @@ function makeSyntheticSpecs(): { v1: SpecJson; v2: SpecJson } {
         name: 'transfer',
         inputs: [{ name: 'amount', type: 'u64' }], // retyped: breaking!
         outputs: [],
+        doc: '',
         isConstructor: false,
       },
       {
         name: 'mint_tokens', // added function!
         inputs: [],
         outputs: [],
+        doc: '',
         isConstructor: false,
       },
     ],

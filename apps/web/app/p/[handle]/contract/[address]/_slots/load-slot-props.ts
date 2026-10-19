@@ -1,3 +1,4 @@
+import type { SpecJson } from '@signet/spec';
 import { normalizeNetwork } from '@signet/types';
 import { attributeContract } from '@/lib/contract-attribution';
 import { loadOverviewSpec, loadWasmVersions } from '@/lib/server/contract-overview-source';
@@ -22,6 +23,8 @@ export async function loadSlotProps(
     loadWasmVersions(address, network),
   ]);
 
+  // `loadContractSpec` always resolves a full `SpecJson`; `SpecInput` only
+  // narrows it to the slice the overview reads, and the changelog diffs all of it.
   let versionSpecs: VersionSpecItem[] | undefined;
   if (wasmVersions.length > 1) {
     versionSpecs = await Promise.all(
@@ -30,7 +33,7 @@ export async function loadSlotProps(
           return {
             wasmHash: v.wasmHash,
             observedAt: v.observedAt,
-            spec: spec.spec,
+            spec: spec.spec as SpecJson,
           };
         }
         const loaded = await loadOverviewSpec({
@@ -42,7 +45,7 @@ export async function loadSlotProps(
           return {
             wasmHash: v.wasmHash,
             observedAt: v.observedAt,
-            spec: loaded.spec,
+            spec: loaded.spec as SpecJson,
           };
         }
         return {

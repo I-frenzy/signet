@@ -81,7 +81,9 @@ export function ContractChanges({ versions, network }: ContractChangesProps): Re
   for (let i = 0; i < versions.length; i++) {
     const current = versions[i]!;
     const shortHash = truncateMiddle(current.wasmHash, 6, 6);
-    const dateStr = formatDate(current.observedAt);
+    const dateStr = formatDate(
+      typeof current.observedAt === 'string' ? current.observedAt : current.observedAt.toISOString(),
+    );
     const headingText = `${shortHash} · observed ${dateStr}`;
 
     if (current.unretrievable || !current.spec) {

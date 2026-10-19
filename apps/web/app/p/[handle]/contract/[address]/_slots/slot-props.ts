@@ -17,4 +17,6 @@ export interface ContractSlotProps {
   spec: SpecInput;
   wasmVersions?: readonly WasmVersionRow[];
   versionSpecs?: readonly VersionSpecItem[];
+  /** Focused node ID (?focus=, issue 505) */
+  focus?: string;
 }
